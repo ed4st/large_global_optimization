@@ -29,26 +29,37 @@ class SHADE:
         self.evals+=self.NP #update number of evaluations
         self.MCR=np.array([0.5]*self.LP) #initialize Crossover memory
         self.MF=np.array([0.5]*self.LP) #initialize F memory
-        self.k=1 
-        self.A=[]
-        self.SCR=[]
-        self.SF=[]
+        self.k=0 # Position of the memory to be updated
+        self.A=[] # Archive
+        self.S=[]
 
-    def PBest1(self,rp,F):
+    def FixCR(self,CR):
+        CR=np.where(CR>1,1,CR)
+        CR=np.where(CR<0,0,CR)
+        return CR
+
+    def FixF(self,F,rpi):
+        F=np.where(F>1,1,F)
+        neg_index=np.argwhere(F<0)
+        for i in neg_index:
+            while(F[i]<=0): #cambiar igualdad a cero por abs
+                F[i]=cauchy(self.MF[rpi[i]],0.1)
+        return F
+
+    def PBest1(self,F):
         '''
         Performs the mutation strategy current-to-pbest/1
         vi=xi+Fi(x_pbest-xi)+Fi(x_r1-x_r2)
         '''
         pbest=np.random.uniform(self.pmin,0.2,size=self.NP)
-        xbest=[]
-        newPop=[]
         V=[]
         for i,p in enumerate(pbest):
-            # ¿Puede ser x_pbest igual xi?
-            xbest=np.argmin(self.PopFitness[:int(p*self.NP)])
+            length=int(p*self.NP)
+            low=np.random.randint(0,self.NP-length)
+            xbest=np.argmin(self.PopFitness[low:low+length])
             newPop=np.delete(range(self.NP),[i,xbest])
             #rand2 cambia si A no es vacío
-            rand=np.random.choice(newPop,size=2)
+            rand=np.random.choice(newPop,size=2,replace=False)
             vi=self.Pop[i]+F[i]*(self.Pop[xbest]-self.Pop[i])+F[i]*(self.Pop[rand[0]]-self.Pop[rand[1]])
             V.append(vi)
         return V
@@ -59,14 +70,41 @@ class SHADE:
         '''
         U=np.zeros((self.NP,self.D))
         randJ=np.random.randint(0,self.D,size=self.NP)
-        for i in range(self.NP):
-
         for i in range(self.D):
             rand=np.random.rand(self.NP)
             U[:,i]=np.where(rand<=CR,V[:,i],self.Pop[:,i])
+        for i in range(self.NP):
+            U[i,randJ[i]]=V[i,randJ[i]]
         return U
 
 
+    def FixA(self):
+        "Fix the size of the archive if exceeds |Pop|"
+        while(len(self.A)>self.Pop.shape[0]):
+            r=np.random.randint(0,len(self.A))
+            del self.A[r]
+
+    #Reiniciar los arreglos U y V despues de usarlos
+
+    def meanWA(self,FitnessU,CR):
+        FitnessU_S=FitnessU[self.S]
+        FitnessPop_S=self.PopFitness[self.S]
+        diff=np.abs(FitnessU_S-FitnessPop_S)
+        sum=np.sum(diff)
+        w=diff/sum
+        mean=np.dot(w,CR[self.S])
+        return mean
+
+    def meanWL(self,FitnessU,F):
+        FitnessU_S=FitnessU[self.S]
+        FitnessPop_S=self.PopFitness[self.S]
+        diff=np.abs(FitnessU_S-FitnessPop_S)
+        sum=np.sum(diff)
+        w=diff/sum
+        SF=F[self.S]
+        mean=np.dot(w,np.square(SF))/np.dot(w,SF)
+        return mean
+        
     def solve(self):
         self.SCR=[]
         self.SF=[]
@@ -75,8 +113,10 @@ class SHADE:
         while(self.evals<self.max_FE):
             rpi=np.random.randint(low=0,high=self.LP,size=self.NP)
             CRi=np.random.normal(self.MCR[rpi],0.1,size=self.NP)
+            CRi=self.FixCR(CRi)
             Fi=cauchy(self.MF[rpi],0.1,size=self.NP)
-            V=self.PBest1(rpi,Fi)
+            Fi=self.FixF(Fi,rpi)
+            V=self.PBest1(Fi)
             U=self.BinCrossover(V,CRi)
             Fitness_trials=self.Fun(U)
             self.evals+=self.NP
@@ -85,5 +125,10 @@ class SHADE:
                     self.Pop[i]=U[i]
                     if (Fitness_trials[i]<self.PopFitness[i]):
                         self.A.append(self.Pop[i])
-
-
+                        self.S.append(i)
+                    self.PopFitness[i]=Fitness_trials[i]
+            self.FixA()
+            if self.S:
+                self.MCR[self.k]=self.meanWA(Fitness_trials,CRi)
+                self.MF[self.k]=self.meanWL(Fitness_trials,Fi)
+                self.k=(self.k+1)%self.LP
