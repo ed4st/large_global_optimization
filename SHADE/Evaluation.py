@@ -1,7 +1,8 @@
 import numpy as np
 from random import choices
 import SHADE
-from cec2013lsgo.cec2013 import Benchmark
+from function import Benchmark
+#from cec2013lsgo.cec2013 import Benchmark
 import time
 import argparse
 
@@ -12,10 +13,6 @@ F3 Ackley
 F7 Schwefel
 F12 Rosenbrock
 '''
-
-def Sphere(x):
-    return np.dot(x,x)
-
 
 def Compute(output_file,Fun,lower_limit,upper_limit,max_FE,NP=100,LP=100,D=1000):
     f=open(output_file,"a")
@@ -31,13 +28,21 @@ def Compute(output_file,Fun,lower_limit,upper_limit,max_FE,NP=100,LP=100,D=1000)
     f.close()
 
 def main(args):
-    bench=Benchmark()
+    """ bench=Benchmark()
     functions={"Sphere":{"Fun":Sphere,"lower":-100,"upper":100},
                "Elliptic":{"Fun":bench.get_function(1),"lower":bench.get_info(1)['lower'],"upper":bench.get_info(1)['upper']},
                "Rastrigin":{"Fun":bench.get_function(2),"lower":bench.get_info(2)['lower'],"upper":bench.get_info(2)['upper']},
                "Ackley":{"Fun":bench.get_function(3),"lower":bench.get_info(3)['lower'],"upper":bench.get_info(3)['upper']},
                "Rosenbrock":{"Fun":bench.get_function(12),"lower":bench.get_info(12)['lower'],"upper":bench.get_info(12)['upper']},
-               "Schwefel":{"Fun":bench.get_function(7),"lower":bench.get_info(7)['lower'],"upper":bench.get_info(7)['upper']}}
+               "Schwefel":{"Fun":bench.get_function(7),"lower":bench.get_info(7)['lower'],"upper":bench.get_info(7)['upper']}} """
+
+    bench=Benchmark()
+    functions={"Sphere":{"Fun":bench.get_function(1),"lower":-100,"upper":100},
+               "Elliptic":{"Fun":bench.get_function(2),"lower":-100,"upper":100},
+               "Rastrigin":{"Fun":bench.get_function(3),"lower":-100,"upper":100},
+               "Ackley":{"Fun":bench.get_function(4),"lower":-100,"upper":100},
+               "Rosenbrock":{"Fun":bench.get_function(6),"lower":-100,"upper":100},
+               "Schwefel":{"Fun":bench.get_function(5),"lower":-100,"upper":100}}
 
     if args.LP:
         LP=args.LP
