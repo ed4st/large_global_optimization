@@ -32,8 +32,9 @@ class Benchmark():
     def __schwefel(self, x):
         pass
     def __rosenbrock(self, x):
-        pass
+        D = len(x)
+        return sum([100*(x[i]**2- x[i+1])**2 + (x[i] - 1)**2 for i in range(D-1)] )
 
 bench = Benchmark()
-function = bench.get_function(1)
-print(function(np.array([1,2])))
+function = bench.get_function(6)
+print(function(np.array([1,2,2,3,4])))
