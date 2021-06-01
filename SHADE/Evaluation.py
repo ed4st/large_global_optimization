@@ -11,7 +11,7 @@ F2 rastrigin
 F3 Ackley
 F7 Schwefel
 F12 Rosenbrock
-¿F15 Schwefel?
+F15 Schwefel
 '''
 
 def Sphere(x):
