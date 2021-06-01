@@ -167,6 +167,3 @@ class SHADE:
                 self.MF[self.k]=self.meanWL(Fitness_trials,np.array(SFitness),Fi)
                 self.k=(self.k+1)%self.LP
         return np.min(self.PopFitness)
-
-def sphere(x):
-    return np.dot(x,x)
