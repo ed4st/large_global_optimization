@@ -32,13 +32,13 @@ class Benchmark():
     def __rastringin(self, x):
         D=x.shape[0]
         sq_x=np.square(x)
-        cosx=np.math.cos(2*np.pi*x)
+        cosx=np.cos(2*np.pi*x)
         return (np.sum(sq_x)+np.sum(cosx)+D*10)
     def __ackley(self, x):
         D = len(x)
         return -20*np.exp(-.2*np.sqrt((1/D)*np.dot(x,x)) - np.exp((1/D)*sum(np.cos(2*np.pi*x)))) + 20 +np.e
     def __schwefel(self, x):
-        csum=np.cumsum(x,axis=1)
+        csum=np.sum(x)
         sq_csum=np.square(csum)
         return np.sum(sq_csum)
     def __rosenbrock(self, x):
@@ -47,4 +47,4 @@ class Benchmark():
 
 bench = Benchmark()
 function = bench.get_function(6)
-print(function(np.array([1,2,2,3,4])))
+print(function(np.array([0,0])))
