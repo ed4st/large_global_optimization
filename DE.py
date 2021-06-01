@@ -1,8 +1,14 @@
 import numpy as np
 from random import choices 
+import time
+#from DE import DifferentialEvolution
+from cec2013lsgo.cec2013 import Benchmark
+import csv
+
+
 class DifferentialEvolution:
-    def __init__(self, function = None, lower_bound = 0, upper_bound = 10, dim = 10, max_eval = 1e5,
-                 F = 1.5, CR = 0.9, pop_size = 100, iterations = 100):
+    def __init__(self, function = None, lower_bound = 0, upper_bound = 10, dim = 1000, max_eval = 1e5,
+                 F = 1.5, CR = 0.9, pop_size = 5000):
         '''
         Current class optimizes a function using Differential Evolutionary Algorithms.
         '''
@@ -14,11 +20,12 @@ class DifferentialEvolution:
         self.F = F # scaling factor in mutation strategy
         self.CR = CR # crossover rate
         self.pop_size = pop_size # population size
-        self.iterations = iterations # number of iterations algorithm will take
+        
     def __initialize(self):
         '''
         Initializes the population randomly
         '''
+        self.__eval_counter = 0 # counter of evaluations in objective function
         self.__population = np.array([np.random.uniform(self.lower_bound, self.upper_bound, size = self.dim)\
             for _ in range(self.pop_size)]) # matrix with rows as random vector of given dimension within domain
     
@@ -68,13 +75,14 @@ class DifferentialEvolution:
         
     def solve(self):
         self.__initialize() # initializing population
-        for _ in range(self.iterations):
+        while self.__eval_counter < self.max_eval:
             #mutate individuals of current population
             trial_vectors =[self.__mutate(self.__population[i], i) for i in range(self.pop_size)]       
             
             #evaluate mutations respect to current population
             for i in range(self.pop_size):
                 if self.function(trial_vectors[i]) < self.function(self.__population[i]):
+                    self.__eval_counter += 2
                     self.__population[i] = trial_vectors[i] # natural selection of the best individual
                                                             # for the next generation
                 else:
@@ -82,16 +90,13 @@ class DifferentialEvolution:
         
         # selecting the best of final population
         best_ix = np.argmin([self.function(self.__population[i]) for i in range(self.pop_size)])
-        print(f"""
-        Best solution reached at x = {self.__population[best_ix]}.
-        Minimum value: {self.function(self.__population[best_ix])}.
-        """)
-                    
-            
-            
+        self.__eval_counter += 2
+        #print(f"""
+        #Best solution reached at x = {self.__population[best_ix]}.
+        #Minimum value: {self.function(self.__population[best_ix])}.
+        #""")
+        return self.function(self.__population[best_ix]) # minimum value
         
-        
-    
 
 def sphere_function(x):
     '''
@@ -106,6 +111,30 @@ def sphere_function(x):
     
         
 if __name__ == '__main__':
-    de = DifferentialEvolution(function = sphere_function)
-    de.solve()
     
+    with open('DE_results.csv', 'w', encoding = 'UTF8') as f:
+        writer = csv.writer(f)
+        
+        bench = Benchmark()
+        f_ix = [1,2,3,7,12] #indices of functions in Benchmark class
+        header = ['runtime', 'function_id', 'value' ,'time', "dim"]
+        writer.writerow(header)
+        
+        for dim in [10, 30, 50]:
+          for runtime in range(20):
+              start_time = time.time()
+              de = DifferentialEvolution(function = sphere_function, pop_size = 100, dim = dim, 
+                                        CR = .95, max_eval=1e4,lower_bound = -100, upper_bound = 100)
+              val_sphere = de.solve() #minimum value of sphere function optimization
+              writer.writerow([str(runtime+1), str(1), str(val_sphere), str(time.time() - start_time), str(dim)])
+              
+              for i in range(5):
+                  start_time = time.time()
+                  function = bench.get_function(f_ix[i])
+                  de = DifferentialEvolution(function = function, pop_size = 100, dim = dim,
+                                            CR = .95, max_eval=1e4, lower_bound = -100, upper_bound = 100)
+                  val_function = de.solve() #minimum value of remaining functions
+                  writer.writerow([str(runtime+1), str(i+2), str(val_function), 
+                                   str(time.time() - start_time), str(dim)]) 
+              print(f"runtime number: {runtime}")
+        
