@@ -11,7 +11,6 @@ F2 rastrigin
 F3 Ackley
 F7 Schwefel
 F12 Rosenbrock
-F15 Schwefel
 '''
 
 def Sphere(x):
@@ -37,8 +36,8 @@ def main(args):
                "Elliptic":{"Fun":bench.get_function(1),"lower":bench.get_info(1)['lower'],"upper":bench.get_info(1)['upper']},
                "Rastrigin":{"Fun":bench.get_function(2),"lower":bench.get_info(2)['lower'],"upper":bench.get_info(2)['upper']},
                "Ackley":{"Fun":bench.get_function(3),"lower":bench.get_info(3)['lower'],"upper":bench.get_info(3)['upper']},
-               "Rosenbrock":{"Fun":bench.get_function(7),"lower":bench.get_info(7)['lower'],"upper":bench.get_info(7)['upper']},
-               "Schwefel":{"Fun":bench.get_function(15),"lower":bench.get_info(15)['lower'],"upper":bench.get_info(15)['upper']}}
+               "Rosenbrock":{"Fun":bench.get_function(12),"lower":bench.get_info(12)['lower'],"upper":bench.get_info(12)['upper']},
+               "Schwefel":{"Fun":bench.get_function(7),"lower":bench.get_info(7)['lower'],"upper":bench.get_info(7)['upper']}}
 
     if args.LP:
         LP=args.LP
