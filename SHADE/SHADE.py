@@ -31,7 +31,6 @@ class SHADE:
         Set the initial values of MCR and MF to 0.5
         '''
         self.Pop=np.random.random_sample((self.NP,self.D))*(self.upper-self.lower)+self.lower
-        #self.PopFitness=self.Fun(self.Pop) #fitness of population
         self.PopFitness=np.apply_along_axis(self.Fun,1,self.Pop)
         self.evals+=self.NP #update number of evaluations
 
@@ -67,7 +66,13 @@ class SHADE:
         for i,p in enumerate(pbest):
             length=int(p*self.NP)
             low=np.random.randint(0,self.NP-length)
-            xbest=np.argmin(self.PopFitness[low:low+length])
+            try:
+                xbest=np.argmin(self.PopFitness[low:low+length])
+            except:
+                length=np.random.choice([0.5,1])
+                low=int((length-0.5)*self.NP)
+                length=int(length*self.NP)
+                xbest=np.argmin(self.PopFitness[low:low+length])
             rand1=None
             rand2=None
             newPop=None
