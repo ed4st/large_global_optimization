@@ -20,7 +20,15 @@ class Benchmark():
             return self.__sphere
     
 
-    def __sphere(self, x):
+    def __sphere(self, x):        
+        '''
+        Return the value of the following function:
+        f(x) = x1^2 + x2^2 + x3^2 + ... xn^2
+
+        Parameters:
+        ---------------------------
+        x : np.array
+        '''
         return np.dot(x,x)
     
     def __elliptic(self, x):
