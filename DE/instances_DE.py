@@ -3,18 +3,7 @@ from DE import DifferentialEvolution
 import numpy as np
 from function import Benchmark
 import csv
-
-def sphere_function(x):
-    '''
-    Return the value of the following function:
-    f(x) = x1^2 + x2^2 + x3^2 + ... xn^2
-    
-    Parameters:
-    ---------------------------
-    x : np.array
-    '''
-    return sum(x*x)
-    
+   
         
 if __name__ == '__main__':
     
