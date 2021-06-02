@@ -44,7 +44,3 @@ class Benchmark():
     def __rosenbrock(self, x):
         D = len(x)
         return sum([100*(x[i]**2- x[i+1])**2 + (x[i] - 1)**2 for i in range(D-1)] )
-
-bench = Benchmark()
-function = bench.get_function(6)
-print(function(np.array([0,0])))
