@@ -1,5 +1,4 @@
 import numpy as np
-from random import choices
 import SHADE
 from function import Benchmark
 #from cec2013lsgo.cec2013 import Benchmark
